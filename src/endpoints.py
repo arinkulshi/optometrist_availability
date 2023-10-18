@@ -1,34 +1,95 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from http import HTTPStatus
-from src.extensions import db
-from src.models import DummyModel
-from webargs import fields
-from webargs.flaskparser import use_args
+from .extensions import db
+from .models import Appointment
+from .utilities import has_conflict
+from datetime import datetime
 
-home = Blueprint('/', __name__)
-
-
+home = Blueprint("/", __name__)
 
 
-
-@home.route('/')
+@home.route("/")
 def index():
-    return {'data': 'OK'}
+    return {"data": "OK"}
 
 
-@home.route('/dummy_model/<id_>', methods=['GET'])
-def dummy_model(id_):
-    record = DummyModel.query.filter_by(id=id_).first()
-    if record is not None:
-        return record.json()
-    else:
-        return jsonify(None), HTTPStatus.NOT_FOUND
 
+@home.route("/appointments", methods=["POST"])
+def create_appointment():
+    data = request.get_json()
+    doctor_id = data["doctor_id"]
+    patient_name = data["patient_name"]
+    start_time = datetime.strptime(data["start_time"], "%Y-%m-%d %H:%M:%S")
+    duration = data["duration"]
 
-@home.route('/dummy_model', methods=['POST'])
-@use_args({'value': fields.String()})
-def dummy_model_create(args):
-    new_record = DummyModel(value=args.get('value'))
-    db.session.add(new_record)
+    #if no conflict then move to next step and create the appointment 
+    conflict_message = has_conflict(doctor_id, start_time, duration)
+    if conflict_message:
+        return jsonify({"error": conflict_message}), HTTPStatus.CONFLICT
+
+    
+    new_appointment = Appointment(
+        doctor_id=doctor_id,
+        patient_name=patient_name,
+        start_time=start_time,
+        duration=duration,
+    )
+    db.session.add(new_appointment)
     db.session.commit()
-    return new_record.json()
+
+    return new_appointment.json(), HTTPStatus.CREATED
+
+
+
+@home.route("/appointments/<int:doctor_id>", methods=["GET"])
+def get_appointments(doctor_id):
+    start_time = request.args.get("start_time")
+    end_time = request.args.get("end_time")
+
+    if not start_time or not end_time:
+        return (
+            jsonify({"error": "Both start_time and end_time are required"}),
+            HTTPStatus.BAD_REQUEST,
+        )
+    
+
+
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    end_time = datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+
+    #Returns all appointments  within that time window
+    appointments = Appointment.query.filter(
+        Appointment.doctor_id == doctor_id,
+        Appointment.start_time >= start_time,
+        Appointment.start_time <= end_time,
+    ).all()
+
+    return {
+        "appointments": [appointment.json() for appointment in appointments]
+    }, HTTPStatus.OK
+
+
+@home.route("/appointments/first_available/<int:doctor_id>", methods=["GET"])
+def get_first_available_appointment(doctor_id):
+    start_time = request.args.get("start_time")
+
+    if not start_time:
+        return jsonify({"error": "start_time is required"}), HTTPStatus.BAD_REQUEST
+
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+
+    #filter for appointments with that specific doctor within that time window
+    appointment = (
+        Appointment.query.filter(
+            Appointment.doctor_id == doctor_id, Appointment.start_time >= start_time
+        )
+        .order_by(Appointment.start_time)
+        .first()
+    )
+
+    if appointment:
+        return {"appointment": appointment.json()}, HTTPStatus.OK
+    else:
+        return {
+            "message": "No available appointments found after the specified time"
+        }, HTTPStatus.NOT_FOUND
