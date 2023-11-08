@@ -5,5 +5,12 @@ All the tests can be run via ```pytest``` inside of the tests directory
 python src.app
 
 
-Let me know if you have any questions. Looking forward to hearing from you. 
+Implement a model to represent an appointment with one of two doctors (Strange, Who). Appointments can be arbitrary length i.e. 20 mins, 45 mins, 60 mins
 
+Implement a model to represent the working hours of each doctor (9 AM to 5 PM, M-F for Strange, 8 AM to 4 PM M-F for Who). You can assume working hours are the same every week. i.e. The schedule is the same each week.
+
+Implement an API to create an appointment, rejecting it if there's a conflict.
+
+Implement an API to get all appointments within a time window for a specified doctor.
+
+Implement an API to get the first available appointment after a specified time. i.e. I'm a patient and I'm looking for the first available appointment
