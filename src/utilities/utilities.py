@@ -2,7 +2,7 @@
 
 
 from datetime import timedelta
-from .models import Appointment, DoctorSchedule
+from models.models import Appointment, DoctorSchedule
 
 
 def has_conflict(doctor_id, start_time, duration):

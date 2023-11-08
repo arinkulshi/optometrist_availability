@@ -1,9 +1,9 @@
 from flask import Flask,Blueprint
-from .endpoints import *
+from api.endpoints import *
 from flask_sqlalchemy import SQLAlchemy
-from .models import *
-from .extensions import db
-from .endpoints import home
+from models.models import *
+from config.extensions import db
+from api.endpoints import home
 
 
 

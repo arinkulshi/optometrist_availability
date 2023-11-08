@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 from http import HTTPStatus
-from .extensions import db
-from .models import Appointment
-from .utilities import has_conflict
+from config.extensions import db
+from models.models import Appointment
+from utilities.utilities import has_conflict
 from datetime import datetime
 
 home = Blueprint("/", __name__)

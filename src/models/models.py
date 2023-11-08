@@ -1,5 +1,5 @@
 from flask import jsonify
-from .extensions import db
+from config.extensions import db
 from datetime import datetime
 import json
 

@@ -1,8 +1,8 @@
 from datetime import datetime
 import pytest
-from ..app import create_app, db
-from ..models import DoctorSchedule
-from ..utilities import has_conflict
+from app import create_app, db
+from models.models import DoctorSchedule
+from utilities.utilities import has_conflict
 
 
 @pytest.fixture

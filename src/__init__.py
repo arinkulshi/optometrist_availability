@@ -1,1 +1,1 @@
-from .endpoints import home
+from .api.endpoints import home
