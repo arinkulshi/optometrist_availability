@@ -2,7 +2,7 @@
 All the tests can be run via ```pytest``` inside of the src/tests directory 
 python -m pytest tests
 
-## Running the full Project
+## Running the full Project locally
 python3 src/app.py
 
 
@@ -15,3 +15,10 @@ Implement an API to create an appointment, rejecting it if there's a conflict.
 Implement an API to get all appointments within a time window for a specified doctor.
 
 Implement an API to get the first available appointment after a specified time. i.e. I'm a patient and I'm looking for the first available appointment
+
+
+Deploying the Project to GCP
+
+#Make sure to have a valid project_id before deploying and a Cloud SQL instance set up 
+gcloud builds submit --tag gcr.io/PROJECT-ID/opp_appointment
+gcloud run deploy --image gcr.io/PROJECT-ID/helloworld --platform managed
