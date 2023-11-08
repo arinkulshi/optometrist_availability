@@ -1,8 +1,9 @@
 ## Running unit tests
-All the tests can be run via ```pytest``` inside of the tests directory 
+All the tests can be run via ```pytest``` inside of the src/tests directory 
+python -m pytest tests
 
 ## Running the full Project
-python src.app
+python3 src/app.py
 
 
 Implement a model to represent an appointment with one of two doctors (Strange, Who). Appointments can be arbitrary length i.e. 20 mins, 45 mins, 60 mins
